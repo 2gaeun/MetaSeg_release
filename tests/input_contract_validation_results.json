@@ -1,0 +1,55 @@
+{
+  "date": "2026-09-28",
+  "status": "completed",
+  "scope": "DICOM folder / NIfTI file ID input contracts and fixed per-volume DA seed 42",
+  "cpu": {
+    "job": 132971,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "unit_tests_passed": 14,
+    "sample_headers_validated": 78,
+    "sample_csv_volumes_loaded": 78,
+    "sample_bytes_unchanged_sha256": 78,
+    "log": "outputs/input_contract_cpu_132971.log"
+  },
+  "gpu": {
+    "job": 132973,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "directions": [
+      "T1CE->BB",
+      "BB->T1CE"
+    ],
+    "seed": 42,
+    "batch_size": 3,
+    "nfe": 50,
+    "volume_runs": 6,
+    "report": "outputs/input_contract_gpu_132973/verification.json",
+    "debug_on": {
+      "volumes": 2,
+      "nfe": 50,
+      "passed": true
+    },
+    "debug_off": {
+      "volumes": 2,
+      "nfe": 50,
+      "passed": true
+    },
+    "nifti_vs_dicom": {
+      "volumes": 2,
+      "seed": 42,
+      "synthetic_and_masks_equal": true
+    },
+    "scope": "Generated classic MR engineering fixture, not clinical DICOM accuracy validation"
+  },
+  "unchanged_segmentation_sha256": {
+    "src/bms_deploy/segment.py": "00d33745c1a61e92fb7e8c81af9a3bbf4d8d1d18cb2040cac33da62874106ff7",
+    "src/bms_deploy/geometry.py": "e8f3a412b1af8ef020a2468fab64ba46e2d8563093fe1577ec4506a13bdaa29b"
+  },
+  "launch_note": "On this cluster the Docker-compatible CLI accepts --gpus <assigned UUID>; --gpus device=<UUID> failed before container startup in job 132972.",
+  "limitations": [
+    "GPU inputs are small generated classic MR fixtures; this does not establish clinical accuracy.",
+    "The 78 real sample volumes were read and validated but not rerun through DA and segmentation.",
+    "Historical prediction equivalence and a new Docker build were outside this change."
+  ]
+}

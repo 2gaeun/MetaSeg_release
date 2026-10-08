@@ -1,0 +1,73 @@
+{
+  "schema": "bms-da-migration-validation-v1",
+  "date": "2026-09-28",
+  "status": "completed",
+  "scope": "DICOM and bidirectional I2SB migration into existing Dataset505 deployment",
+  "models": {
+    "t1ce2bb": {"training_job": 112788, "step": 175000, "weights": "EMA"},
+    "bb2t1ce": {"training_job": 114599, "step": 150000, "weights": "EMA"},
+    "segmentation": {"training_job": 123195, "epoch": 1000, "dataset": 505}
+  },
+  "cpu_export": {
+    "job": 132923,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "unit_tests_passed": 8,
+    "ema_parameter_tensors_per_model": 566,
+    "all_exported_tensors_match_source": true,
+    "provenance": "weights/da_export.json"
+  },
+  "existing_environment_gpu_test": {
+    "job": 132924,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "report": "outputs/da_pipeline_132924/verification.json"
+  },
+  "docker_build": {
+    "job": 132925,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "image": "brainmetaseg-da-deploy:0.2.0",
+    "image_id": "41be76fc731d4b783029637a12aff46f8791d6b479e5ca18c84595123479612d",
+    "unit_tests_passed": 8,
+    "unit_test_network": "none"
+  },
+  "image_archive": {
+    "job": 132927,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "path": "docker/brainmetaseg-da-deploy_0.2.0.tar.gz",
+    "bytes": 4550141964,
+    "gzip_integrity_passed": true
+  },
+  "portable_image_gpu_test": {
+    "job": 132928,
+    "state": "COMPLETED",
+    "exit_code": "0:0",
+    "node": "gpu120",
+    "network": "none",
+    "mounted_inputs": "dist only; no original model or dataset repository",
+    "report": "outputs/da_pipeline_132928/verification.json",
+    "directions": ["T1CE->BB", "BB->T1CE"],
+    "nfe": 50,
+    "volumes_per_debug_mode": 2,
+    "debug_on_passed": true,
+    "debug_off_passed": true,
+    "native_mask_geometry_passed": true,
+    "binary_mask_check_passed": true,
+    "debug_toggle_native_masks_equal": true,
+    "debug_outputs_finite": true,
+    "no_input_nifti_intermediate": true
+  },
+  "unchanged_existing_code_sha256": {
+    "src/bms_deploy/segment.py": "00d33745c1a61e92fb7e8c81af9a3bbf4d8d1d18cb2040cac33da62874106ff7",
+    "src/bms_deploy/geometry.py": "e8f3a412b1af8ef020a2468fab64ba46e2d8563093fe1577ec4506a13bdaa29b",
+    "src/bms_deploy/dicom_input.py": "aa485b4ee0f4e62d1a3fcd6a2dc8ad2aeffb52bfc979e27aec9ee007c39978b7"
+  },
+  "limitations": [
+    "GPU end-to-end inputs are generated classic-MR engineering fixtures, not clinical DICOM volumes.",
+    "Full 78 NIfTI sample set was not regenerated through DA.",
+    "Historical synthetic voxel equality is not asserted across different seeds or batch grouping.",
+    "Regular Docker localhost-tag alias handling is provided in docker/load.sh; runtime verification used this cluster's Podman-compatible CLI."
+  ]
+}

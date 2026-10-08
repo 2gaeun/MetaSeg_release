@@ -1,0 +1,23 @@
+# Local datasets and inference outputs (including CSV/manifests).
+/samples/
+/outputs/
+
+# Model binaries and exported Docker images stay local.
+/weights/**/*.pth
+/weights/**/*.pt
+/weights/**/*.ckpt
+/weights/**/*.safetensors
+/docker/*.tar
+/docker/*.tar.gz
+/docker/*.partial*
+
+# Machine-specific bundle inventory; includes local datasets/artifacts.
+/assets*.json
+
+# Python build/cache files.
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+/src/build/
+/.venv/

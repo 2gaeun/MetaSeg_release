@@ -1,0 +1,21 @@
+{
+    "channel_names": {
+        "0": "T1CE_like",
+        "1": "BB_like"
+    },
+    "labels": {
+        "background": 0,
+        "metastasis": 1
+    },
+    "numTraining": 795,
+    "file_ending": ".nii.gz",
+    "overwrite_image_reader_writer": "NibabelIOWithReorient",
+    "dataset_name": "Dataset505_BrainMet_Synthetic_2ch_RealChannelCrop_DHW112x128x160",
+    "real_channel_crop": {
+        "policy": "nonzero_bbox_from_manifest_real_channel_applied_to_both_channels_and_label",
+        "source_dataset": "Dataset501_BrainMet_Synthetic_2ch",
+        "source_export_manifest": "/home/logs/brainmetaseg/export/nnunet_2ch_export_manifest.csv",
+        "case_manifest": "real_channel_crop_manifest.csv",
+        "real_channel_field": "real_channel_index"
+    }
+}

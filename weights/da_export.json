@@ -1,0 +1,26 @@
+{
+  "t1ce2bb": {
+    "training_job": 112788,
+    "step": 175000,
+    "source_checkpoint": "/source/t1ce2bb/step_0175000.pt",
+    "source_bytes": 11057171265,
+    "source_mtime_ns": 1782081637722616519,
+    "ema_tensors": 566,
+    "all_exported_tensors_equal": true,
+    "file": "weights/t1ce2bb_112788_step0175000/ema.pt",
+    "bytes": 2211367134,
+    "sha256": "a35914ccfd5c227572695b6fb206400ea35dde3d0b2e92b1825f03fc73580fdf"
+  },
+  "bb2t1ce": {
+    "training_job": 114599,
+    "step": 150000,
+    "source_checkpoint": "/source/bb2t1ce/step_0150000.pt",
+    "source_bytes": 11057171265,
+    "source_mtime_ns": 1782744481742804542,
+    "ema_tensors": 566,
+    "all_exported_tensors_equal": true,
+    "file": "weights/bb2t1ce_114599_step0150000/ema.pt",
+    "bytes": 2211367134,
+    "sha256": "6bcc638667dfb694bfbb29aaf945fd2667c5370c53049aaf1b626d12e1999b99"
+  }
+}

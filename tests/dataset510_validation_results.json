@@ -1,0 +1,640 @@
+{
+  "status": "completed",
+  "checkpoint_filename": "checkpoint_epoch_0950.pth",
+  "selected_epoch_label": 950,
+  "stored_current_epoch": 952,
+  "training_job": 131329,
+  "dataset": 510,
+  "skull_stripping": false,
+  "da": {
+    "seed": 0,
+    "batch_size": 8,
+    "nfe": 50,
+    "models": [
+      112788,
+      114599
+    ],
+    "sampling_unchanged": true
+  },
+  "unit_tests": 20,
+  "da_before_after_control": {
+    "status": "completed",
+    "gpu": "Quadro RTX 8000",
+    "scope": "Three native slices, both directions; identical raw DA tensors before/after the Dataset510 boundary change on the same device.",
+    "cases": [
+      {
+        "sequence": "T1CE",
+        "seed": 0,
+        "batch_size": 8,
+        "nfe": 50,
+        "input_exact": true,
+        "raw_output_different_voxels": 0,
+        "raw_output_max_abs": 0.0
+      },
+      {
+        "sequence": "BB",
+        "seed": 0,
+        "batch_size": 8,
+        "nfe": 50,
+        "input_exact": true,
+        "raw_output_different_voxels": 0,
+        "raw_output_max_abs": 0.0
+      }
+    ]
+  },
+  "e2e_extra_checks": [
+    {
+      "case_id": "BrainMet_test_00018",
+      "da_input_vs_prior_seed0_exact": true,
+      "da_input_vs_prior_seed0_max_abs": 0.0,
+      "native_probability_threshold_equals_mask": true,
+      "real_bbox_xyz": [
+        [
+          0,
+          256
+        ],
+        [
+          0,
+          256
+        ],
+        [
+          0,
+          172
+        ]
+      ],
+      "real_channel_index": 0,
+      "channel_order_matches": true,
+      "export_and_internal_crops_match": true
+    },
+    {
+      "case_id": "BrainMet_test_00048",
+      "da_input_vs_prior_seed0_exact": true,
+      "da_input_vs_prior_seed0_max_abs": 0.0,
+      "native_probability_threshold_equals_mask": true,
+      "real_bbox_xyz": [
+        [
+          0,
+          256
+        ],
+        [
+          12,
+          245
+        ],
+        [
+          0,
+          240
+        ]
+      ],
+      "real_channel_index": 1,
+      "channel_order_matches": true,
+      "export_and_internal_crops_match": true
+    }
+  ],
+  "portable_smoke": {
+    "debug_on": {
+      "volumes": 2,
+      "nfe": 50,
+      "passed": true
+    },
+    "debug_off": {
+      "volumes": 2,
+      "nfe": 50,
+      "passed": true
+    },
+    "nifti_vs_dicom": {
+      "volumes": 2,
+      "seed": 0,
+      "synthetic_and_masks_equal": true
+    },
+    "scope": "Generated classic MR engineering fixture, not clinical DICOM accuracy validation"
+  },
+  "probability_discrepancy": {
+    "case_id": "BrainMet_test_00048",
+    "space": "nnUNet internal axes",
+    "crossing_voxels": 1,
+    "coordinates": [
+      [
+        72,
+        51,
+        142
+      ]
+    ],
+    "reference_probability": [
+      0.5001220703125
+    ],
+    "deployment_probability": [
+      0.49981689453125
+    ],
+    "max_absolute_probability_difference": 0.0014388859272003174,
+    "probability_mae": 2.7434353489380063e-09,
+    "inference_environment": "deployment RTX8000; reference historical job132408",
+    "restore_with_same_reference_probability": "exact pseudo and native masks",
+    "full_pseudo_changed_xyz": [
+      [
+        142,
+        63,
+        72
+      ]
+    ],
+    "sampled_by_xy_nearest": [
+      false
+    ]
+  },
+  "scope": "Six stored pairs, two real-volume end-to-end runs, generated DICOM/NIfTI fixture. Not a full78 rerun or GT accuracy evaluation. Existing research outputs were read-only.",
+  "validation_jobs": {
+    "cpu": 134640,
+    "pairs": 134638,
+    "e2e_t1ce_inference": 134642,
+    "e2e_t1ce_post_evaluation": 134650,
+    "e2e_bb_and_smoke": 134646,
+    "da_before_after_control": 134655
+  },
+  "pair_cases": [
+    {
+      "case_id": "BrainMet_test_00001",
+      "mode": "pairs",
+      "channels_crop_preprocessed_exact": true,
+      "inverse_reference_probability_pseudo": {
+        "shape": [
+          256,
+          256,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "inverse_reference_probability_native": {
+        "shape": [
+          1024,
+          1024,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          1024,
+          1024,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "sequence": "T1CE"
+    },
+    {
+      "case_id": "BrainMet_test_00006",
+      "mode": "pairs",
+      "channels_crop_preprocessed_exact": true,
+      "inverse_reference_probability_pseudo": {
+        "shape": [
+          256,
+          256,
+          160
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "inverse_reference_probability_native": {
+        "shape": [
+          512,
+          512,
+          160
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          160
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          512,
+          512,
+          160
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "sequence": "BB"
+    },
+    {
+      "case_id": "BrainMet_test_00011",
+      "mode": "pairs",
+      "channels_crop_preprocessed_exact": true,
+      "inverse_reference_probability_pseudo": {
+        "shape": [
+          256,
+          256,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "inverse_reference_probability_native": {
+        "shape": [
+          480,
+          480,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          480,
+          480,
+          150
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "sequence": "T1CE"
+    },
+    {
+      "case_id": "BrainMet_test_00018",
+      "mode": "pairs",
+      "channels_crop_preprocessed_exact": true,
+      "inverse_reference_probability_pseudo": {
+        "shape": [
+          256,
+          256,
+          172
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "inverse_reference_probability_native": {
+        "shape": [
+          512,
+          512,
+          115
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          172
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          512,
+          512,
+          115
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "sequence": "T1CE"
+    },
+    {
+      "case_id": "BrainMet_test_00048",
+      "mode": "pairs",
+      "channels_crop_preprocessed_exact": true,
+      "inverse_reference_probability_pseudo": {
+        "shape": [
+          256,
+          256,
+          240
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "inverse_reference_probability_native": {
+        "shape": [
+          240,
+          240,
+          176
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          240
+        ],
+        "different_voxels": 1,
+        "voxel_agreement": 0.9999999364217123,
+        "mae": 6.357828776041667e-08,
+        "max_abs": 1.0,
+        "dice": 0.9965635738831615,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          240,
+          240,
+          176
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "sequence": "BB"
+    },
+    {
+      "case_id": "BrainMet_test_00059",
+      "mode": "pairs",
+      "channels_crop_preprocessed_exact": true,
+      "inverse_reference_probability_pseudo": {
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "inverse_reference_probability_native": {
+        "shape": [
+          180,
+          256,
+          256
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          256
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          180,
+          256,
+          256
+        ],
+        "different_voxels": 0,
+        "voxel_agreement": 1.0,
+        "mae": 0.0,
+        "max_abs": 0.0,
+        "dice": 1.0,
+        "geometry_match": true
+      },
+      "sequence": "BB"
+    }
+  ],
+  "e2e_cases": [
+    {
+      "case_id": "BrainMet_test_00018",
+      "mode": "e2e",
+      "da_real_vs_stored": {
+        "shape": [
+          256,
+          256,
+          172
+        ],
+        "different_voxels": 2786211,
+        "voxel_agreement": 0.7528243841126907,
+        "mae": 1.3379448329604117e-08,
+        "max_abs": 1.7881393432617188e-07
+      },
+      "da_synthetic_vs_stored": {
+        "shape": [
+          256,
+          256,
+          172
+        ],
+        "different_voxels": 11270037,
+        "voxel_agreement": 0.0001911784327307542,
+        "mae": 0.01639156711014551,
+        "max_abs": 1.716050922870636
+      },
+      "transform_geometry_matches": true,
+      "seed": 0,
+      "nfe": 50,
+      "batch_size": 8,
+      "da_network_vs_prior_seed0": {
+        "shape": [
+          256,
+          256,
+          172
+        ],
+        "different_voxels": 11270527,
+        "voxel_agreement": 0.00014770862668056495,
+        "mae": 0.014252424358881808,
+        "max_abs": 1.6436873078346252
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          172
+        ],
+        "different_voxels": 92,
+        "voxel_agreement": 0.9999918383221293,
+        "mae": 8.161677870639534e-06,
+        "max_abs": 1.0,
+        "dice": 0.994685153090699,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          512,
+          512,
+          115
+        ],
+        "different_voxels": 244,
+        "voxel_agreement": 0.9999919062075407,
+        "mae": 8.093792459239131e-06,
+        "max_abs": 1.0,
+        "dice": 0.9947099124100252,
+        "geometry_match": true
+      },
+      "sequence": "T1CE"
+    },
+    {
+      "case_id": "BrainMet_test_00048",
+      "mode": "e2e",
+      "da_real_vs_stored": {
+        "shape": [
+          256,
+          256,
+          240
+        ],
+        "different_voxels": 3854178,
+        "voxel_agreement": 0.7549579620361329,
+        "mae": 1.3749353999781277e-08,
+        "max_abs": 1.1920928955078125e-07
+      },
+      "da_synthetic_vs_stored": {
+        "shape": [
+          256,
+          256,
+          240
+        ],
+        "different_voxels": 15530381,
+        "voxel_agreement": 0.0126049677530925,
+        "mae": 0.021163021923168608,
+        "max_abs": 1.5661395192146301
+      },
+      "transform_geometry_matches": true,
+      "seed": 0,
+      "nfe": 50,
+      "batch_size": 8,
+      "da_network_vs_prior_seed0": {
+        "shape": [
+          256,
+          256,
+          240
+        ],
+        "different_voxels": 15726506,
+        "voxel_agreement": 0.00013567606608078098,
+        "mae": 0.01844286849605634,
+        "max_abs": 1.5915836095809937
+      },
+      "pseudo": {
+        "shape": [
+          256,
+          256,
+          240
+        ],
+        "different_voxels": 21,
+        "voxel_agreement": 0.999998664855957,
+        "mae": 1.33514404296875e-06,
+        "max_abs": 1.0,
+        "dice": 0.9257950530035336,
+        "geometry_match": true
+      },
+      "native": {
+        "shape": [
+          240,
+          240,
+          176
+        ],
+        "different_voxels": 10,
+        "voxel_agreement": 0.9999990135732323,
+        "mae": 9.864267676767677e-07,
+        "max_abs": 1.0,
+        "dice": 0.9390243902439024,
+        "geometry_match": true
+      },
+      "sequence": "BB"
+    }
+  ]
+}

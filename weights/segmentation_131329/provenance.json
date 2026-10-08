@@ -1,0 +1,22 @@
+{
+  "training_job": 131329,
+  "checkpoint_filename": "checkpoint_epoch_0950.pth",
+  "selected_epoch_label": 950,
+  "trainer": "nnUNetTrainerBrainMetaFocalLR3e3Components",
+  "files": {
+    "plans.json": {
+      "sha256": "c1a6b1c248b6168202ef9538ab57a656ad9eafc00e8f3f074f8647158b106853",
+      "bytes": 16711
+    },
+    "dataset.json": {
+      "sha256": "11abafad852b813c5c70530ac492a099a0e81824e5eb1b91ac132f243871275b",
+      "bytes": 968
+    },
+    "checkpoint_epoch_0950.pth": {
+      "sha256": "8aa7987162b9fd91e318fe49c232eb1205e36564d7208b0f6ab0de4a9d6c2d85",
+      "bytes": 246751090
+    }
+  },
+  "skull_stripping": false,
+  "network_policy": "Trainer chain inherits nnUNetTrainer.build_network_architecture unchanged; bundled inference adapter uses that method. Archived trainer_source is provenance, not a runtime dependency."
+}

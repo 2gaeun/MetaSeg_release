@@ -1,0 +1,24 @@
+{
+    "channel_names": {
+        "0": "T1CE_like",
+        "1": "BB_like"
+    },
+    "labels": {
+        "background": 0,
+        "metastasis": 1
+    },
+    "numTraining": 801,
+    "file_ending": ".nii.gz",
+    "overwrite_image_reader_writer": "NibabelIOWithReorient",
+    "dataset_name": "Dataset510_BrainMet_Synthetic_2ch_Pseudo1mm_RealChannelCrop_DHW112x128x160",
+    "model_space_pairing": {
+        "space_name": "pseudo-1mm model space",
+        "transform_schema": "i2sb-pseudo-1mm-transform-v1",
+        "source_root": "/home/data_synthetic/model-space",
+        "geometry_policy": "strict-pseudo-1mm-grid-no-resampling",
+        "channel_order": "channel0=T1CE_like, channel1=BB_like",
+        "crop_policy": "real-channel-normalized-background-bbox",
+        "case_manifest": "model_space_real_channel_crop_manifest.csv",
+        "native_restore": "Use I2SB prepare_pseudo_1mm_labels.restore_mask after undoing recorded bbox; NOT physical v2 restore"
+    }
+}

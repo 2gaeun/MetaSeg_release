@@ -1,0 +1,6 @@
+weights/
+samples/
+outputs/
+**/__pycache__/
+*.partial*
+docker/*.tar.gz

@@ -1,0 +1,29 @@
+{
+  "date_kst": "2026-09-28",
+  "cpu_job": 132881,
+  "gpu_job": 132879,
+  "cpu_job_status": "COMPLETED exit 0",
+  "gpu_job_status": "COMPLETED exit 0",
+  "unit_tests_passed": 4,
+  "sample_header_pairs_validated": 78,
+  "sample_counts": {"1mm": 31, "LE0p5mm": 47},
+  "original_brainmetaseg_module_imported": false,
+  "checkpoint_strict_load_epoch": 1000,
+  "preprocessing_reference_max_abs_error": {
+    "BrainMet_test_00001": 0.0,
+    "BrainMet_test_00048": 0.00000476837158203125
+  },
+  "native_prediction_comparison_to_historical_probability_ge_0p5": [
+    {"case_id": "BrainMet_test_00048", "sequence": "BB", "group": "1mm", "geometry_match": true,
+     "foreground_voxels": 303, "mask_agreement_dice": 1.0, "different_voxels": 0},
+    {"case_id": "BrainMet_test_00001", "sequence": "T1CE", "group": "LE0p5mm", "geometry_match": true,
+     "foreground_voxels": 31783, "mask_agreement_dice": 0.9999528057010713, "different_voxels": 3}
+  ],
+  "debug_on_checked": true,
+  "debug_off_checked": true,
+  "real_clinical_dicom_end_to_end_checked": false,
+  "dicom_unit_fixture": "two generated classic MR series; no intermediate NIfTI",
+  "da_migrated": false,
+  "new_docker_image_built": false,
+  "notes": "Prediction agreement Dice is NOT Dice against ground truth. High-resolution output is not bit-identical to the historical prediction. All 78 samples were copied and header-checked; only two were inference-tested."
+}
