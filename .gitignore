@@ -1,6 +1,7 @@
 # Local datasets and inference outputs (including CSV/manifests).
 /samples/
 /outputs/
+/backups/
 
 # Model binaries and exported Docker images stay local.
 /weights/**/*.pth

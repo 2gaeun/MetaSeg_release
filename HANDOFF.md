@@ -1,7 +1,72 @@
 # BrainMetaSeg 배포 인수인계
 
-현재 계약: 2026-10-06. 모든 입력과 출력은 **skull stripping 미적용**이다.
-Brain mask 생성·적용, 연결요소 제거, 크기 필터는 수행하지 않는다.
+현재 계약: 2026-10-08. **v1은 기존 파이프라인**, **v2는 선택적 SynthStrip 1.8 후처리**다.
+기본값은 후처리 OFF다. 모든 입력 영상과 DA/병변 분할 입력은 skull stripping하지 않는다.
+ON일 때만 원본 native 영상의 brain mask와 최종 native 병변 mask를 AND한다.
+병변의 연결요소 제거, 크기 필터, brain mask dilation은 추가하지 않는다.
+
+## v1 백업과 v2 실행
+
+| 구분 | 이미지 | 오프라인 아카이브 |
+|---|---|---|
+| v1: 검증된 기존 환경 | `brainmetaseg-da-deploy:v1` | `docker/brainmetaseg-da-deploy_v1.tar.gz` |
+| v2: SynthStrip 1.8 포함 | `brainmetaseg-da-deploy:v2` | `docker/brainmetaseg-da-deploy_v2.tar.gz` |
+
+v1은 기존 `0.2.0` 이미지와 동일 ID
+`41be76fc731d4b783029637a12aff46f8791d6b479e5ca18c84595123479612d`다.
+기존 `brainmetaseg-da-deploy_0.2.0.tar.gz`도 보존했다. 각 새 아카이브의 `.sha256`을 함께 전달한다.
+후처리 추가 전 코드(commit `fe01793`)는 `backups/v1/source.tar.gz`와 provenance에 보존했다.
+Weights는 기존 `weights/`에 그대로 있으며 source archive에는 모델 바이너리가 포함되지 않는다.
+
+```bash
+# 그대로 사용할 이미지 로드: 실제 배포 환경에서 재빌드할 필요가 없다.
+bash docker/load.sh v1
+bash docker/load.sh v2
+
+# v2를 직접 빌드해야 할 때: 검증된 v1을 먼저 로드한다.
+bash docker/load.sh v1
+bash docker/build.sh v2
+
+# 각 이미지 안에서 dist를 /bundle에 mount한 뒤 실행한다.
+bash /bundle/run.sh --input-format nifti --input-root /input --csv /input.csv \
+  --output /output/v2 --skull-strip on --debug
+bash /bundle/run.sh --input-format nifti --input-root /input --csv /input.csv \
+  --output /output/v1 --skull-strip off
+# v1 전용 실행 파일도 제공한다.
+bash /bundle/run_v1.sh --input-format nifti --input-root /input --csv /input.csv \
+  --output /output/v1_backup
+```
+
+v2 빌드가 실패하면 v1 이미지와 아카이브는 그대로 남는다. **v1을 로드해 run_v1.sh로 명시적으로 실행**한다.
+빌드 실패나 SynthStrip 오류를 이유로 요청된 후처리를 조용히 생략하지 않는다.
+v1 이미지에서도 현재 소스의 OFF 경로가 동작하며 SynthStrip 의존성이 필요 없다.
+`docker/build.sh v1`은 Dockerfile로 환경을 새로 만드는 명령이므로, 정확한 백업 복원에는 `load.sh v1`을 쓴다.
+
+`Dockerfile.v2`는 공식 `freesurfer/synthstrip:1.8` digest에서 원본 script, model-v1 weights와
+Surfa/xxhash/importlib_resources를 복사한다. 기존 torch/numpy/nnU-Net은 업그레이드하지 않는다.
+출처·버전·파일 해시는 `docker/synthstrip1.8.json`에 있다. 현재 빌드/검증 플랫폼은 Linux amd64, Python 3.10이다.
+
+## v2 후처리 계약
+
+- `--skull-strip on|off`: 기본 `off`. 결과 metadata의 pipeline_version은 ON이면 v2, OFF이면 v1이다.
+- `--synthstrip-device cpu|cuda`: 기본 `cpu`. 별도 프로세스에서 실행하여 부모의 DA/분할 설정에 영향을 주지 않는다.
+  CUDA는 선택할 수 있으나 기존 모델 상주 상태의 추가 VRAM 요구량은 아직 검증하지 않았다.
+- NIfTI는 원본 파일을 그대로 SynthStrip에 전달한다. DICOM은 읽은 native 영상을 임시 NIfTI로 전달한다.
+  DA normalization, synthetic, pseudo grid를 brain extraction 입력으로 사용하지 않는다.
+- 기본 SynthStrip border=1mm, `--no-csf` 미사용. 기존 reference 생성 설정을 유지한다.
+- 원본/brain/병변 mask의 shape·affine을 검사하고, 불일치 시 보간하거나 조정하지 않고 오류를 낸다.
+- 최종 출력은 `(native lesion != 0) AND (native brain != 0)`의 uint8 binary mask다.
+  후처리가 성공해야 최종 파일을 공개 경로에 저장한다. 실패 시 미처리 mask는 logs의 pending 파일로 남고,
+  해당 case는 failed로 기록된다.
+- pseudo/model-space mask는 기존 분할 결과를 유지한다. 필터링은 native-space에서만 적용한다.
+- Debug ON에서는 기존 native mask/probability를 `*_before_skullstrip.nii.gz`로 보존하고,
+  `brain_mask.nii.gz`, 필터링한 `native_mask.nii.gz`와 `native_probability.nii.gz`를 저장한다.
+- Debug OFF에서는 성공한 최종 mask만 영상으로 남는다. `logs/postprocessing.json`, `logs/synthstrip.log`로
+  버전·조건·foreground voxel 수·소요시간·오류 출처를 확인할 수 있다.
+- 원본 native 영상이 없는 `nifti-pairs` 모드에는 ON을 허용하지 않는다.
+- 출력 경로는 기존 `--output` 인자를 사용하며 NAS 검증 경로를 배포 코드에 고정하지 않는다.
+
+후처리 구현 검증 결과와 범위는 문서 마지막의 v2 검증 항목을 참고한다.
 
 ## 모델과 독립 실행
 
@@ -111,12 +176,13 @@ real_channel_index를 신규 입력에서 직접 생성한다. GT는 생성 과�
 output/
   manifest.json, manifest.partial.json
   errors.json                         # 실패 시
-  <output_id>.nii.gz                   # 최종 native binary mask, skull stripping 없음
+  <output_id>.nii.gz                   # 최종 native binary mask; ON이면 후처리 적용
   <output_id>/logs/
     result.json                       # dataset510, job131329, filename/stored epoch
     da_result.json                    # DA 수행 시, seed0/sampling/transform
     transform.json                    # 전용 pseudo transform
     crop.json                         # export bbox + nnU-Net properties + channel provenance
+    postprocessing.json, synthstrip.log # 후처리 ON
     debug/                            # --debug ON일 때만
       real_pseudo.nii.gz, synthetic_pseudo.nii.gz
       da_input_network.nii.gz, da_output_network.nii.gz, da_geometry.json
@@ -125,6 +191,8 @@ output/
       model_mask.nii.gz, model_probability.nii.gz
       pseudo_mask.nii.gz, pseudo_probability.nii.gz
       native_mask.nii.gz, native_probability.nii.gz, geometry.json
+      brain_mask.nii.gz                 # 후처리 ON
+      native_mask_before_skullstrip.nii.gz, native_probability_before_skullstrip.nii.gz # ON
 ```
 
 `model_*`는 내부 nnU-Net crop/transpose 전처리 grid, `pseudo_*`는 crop을 되돌린 전체 nominal grid다.
@@ -136,8 +204,8 @@ Pseudo voxel 수를 physical mm³로 해석하지 않는다. Debug OFF의 영상
 `docker/requirements.txt`의 torch2.3.1, CUDA11.8/cuDNN8 runtime, nnunetv2==2.8.1을 유지한다.
 기존 `brainmetaseg-da-deploy:0.2.0` 이미지를 dependency runtime으로 사용할 수 있다.
 실행 시 반드시 번들을 mount하여 `bash /bundle/run.sh`로 호출한다. 이미지 내부의 과거 설치 코드 대신
-run.sh가 지정한 현재 bundle/src가 사용된다. 소스 package version은 0.3.0이다.
-오프라인 이미지 아카이브는 `docker/load.sh`로 로드할 수 있다.
+run.sh가 지정한 현재 bundle/src가 사용된다. 소스 package version은 2.0.0이다.
+오프라인 이미지 아카이브는 `docker/load.sh v1` 또는 `docker/load.sh v2`로 로드한다.
 
 ```bash
 PYTHONPATH=src python -m unittest discover -s tests -p 'test_*.py' --verbose
@@ -155,7 +223,7 @@ python tools/refresh_assets.py --verify
 `tools/refresh_assets.py`, 본 문서, 신규 segmentation weights와 assets.json.
 과거 source는 outputs의 migration backup에 보존했다. 기존 연구 결과와 실행 중인 학습 job은 변경하지 않았다.
 
-### 이번 전환 검증 결과
+### Dataset510 전환 검증 결과 (2026-10-06, v1)
 
 검증 출력: `outputs/dataset510_migration_20261006_144603/`.
 참조: `test_seed42_dataset510_focal131329_epoch0950_job132408/evaluation_job132409`의 skull stripping 미적용 결과.
@@ -228,3 +296,63 @@ native mask에는 차이가 없었다. 이 규칙을 보정하거나 nearest-exa
 `tests/verify_dataset510.py`가 이번 비교용 entrypoint다. 연구 참조 경로는 인자로 전달한다.
 `tests/verify_reference.py`와 `tools/bundle_assets.py`는 과거 Dataset505용이며 현재 bundle에 실행하지 않는다.
 과거 tests/*validation_results.json은 당시 결과를 그대로 보존한다.
+
+
+## v2 후처리 검증 (2026-10-08)
+
+검증은 기존에 저장한 78개 결과 중 6개 native lesion mask와 원본 MRI를 이용했다.
+**DA 및 병변 분할 모델은 새로 실행하지 않았다.** 기존 입력/학습 job/연구 결과는 변경하지 않았다.
+신규 검증 로그와 brain mask, 후처리 전후 mask/probability는 사용자 지정 NAS의
+`logs/nnUNet_test_inference/_dist_v2/postprocess_validation_20261008_122415/`에 별도로 저장했다.
+이는 검증 기록 위치이며 배포 실행 코드의 기본 출력 경로가 아니다.
+
+- 기존 20개 + 신규 후처리 8개 단위 테스트가 **v1/v2 각각 28개 통과**했다(job 134962).
+  CLI 연결 테스트의 DA/Segmenter는 mock이며 실제 전체 추론 검증과 구분한다.
+- 실제 SynthStrip 및 후처리 검증은 CPU 2 threads, 독립 Slurm CPU job 134963에서 수행했다.
+  T1CE/BB, XY 1024/512/480/240/180, z spacing 1/1.5mm, LPS/LAS/SAR/RAS를 포함한다.
+- 6개 모두 brain/native mask의 원본 shape·geometry 일치, binary 값, 병변 AND 연산을 확인했다.
+  Debug probability와 최종 mask의 일치 및 실패 시 최종 파일을 남기지 않는 동작은 단위 테스트로 검증했다.
+- v1/v2 이미지 모두 tar.gz 저장 후 SHA256 검사와 실제 `docker load`를 수행했고,
+  재로드 전후 image ID가 동일했다(job 134966). v1에서 `run_v1.sh --help`도 확인했다.
+- v1 tar.gz SHA256: `925cb8dcde66d178cc81b4d7a3f95d366720e41dc78bcdc3dcf08e86fe2c07fa`.
+- v2 tar.gz SHA256: `153ecfbc0faefc3911f1756128350658fb4e61bc43b07fc52c780cdda25f2b5a`.
+- v2 image ID: `8a2713adfcf53cf69d2ce98ec7ab6567a00eba2fa1e70e2e6f8647470efa5e28`.
+
+기존 `data/brainmask_SynthStrip/masks_binary`와의 비교:
+
+| Case | Sequence | brain 불일치 voxel | brain Dice | 기존 brain으로 필터링한 병변과 불일치 voxel |
+|---|---|---:|---:|---:|
+| BrainMet_test_00001 | T1CE | 0 | 1 | 0 |
+| BrainMet_test_00006 | BB | 1 | 0.9999999383 | 0 |
+| BrainMet_test_00011 | T1CE | 0 | 1 | 0 |
+| BrainMet_test_00018 | T1CE | 0 | 1 | 0 |
+| BrainMet_test_00048 | BB | 20,571 | 0.9934044413 | 0 |
+| BrainMet_test_00059 | BB | 1 | 0.9999996919 | 0 |
+
+표의 Dice는 저장된 brain mask와의 일치도이며 GT에 대한 병변 DSC가 아니다.
+Brain mask 자체의 완전 일치는 3/6이다. 저장 brain과 새 brain을 적용한 병변 결과는 6/6 완전 일치했다.
+후처리 전후 병변 voxel은 00001에서 42,016→42,007, 00018에서 23,060→23,046이고 나머지는 동일했다.
+요약은 `tests/postprocess_validation_results.json`, 상세 비교는 검증 폴더의 `comparison.json`에 있다.
+
+### 저장 reference 차이의 대조 확인
+
+차이가 난 00006/00048/00059를 공식 `freesurfer/synthstrip:1.8` 이미지에서 동일 원본,
+CPU 2 threads로 재실행했다(job 134977). **세 사례 모두 공식 이미지와 v2 brain mask가 voxel 단위로 완전히 일치**했다.
+공식 환경은 torch 2.1.2+cpu, v2는 기존 torch 2.3.1 환경이며 이번 비교에서는 결과 차이가 없었다.
+
+00048은 공식 이미지로 T1CE를 추가 실행한 뒤 BB brain mask와 OR했다(job 134978).
+이 **두 시퀀스 합집합은 저장 reference와 불일치 0 voxel**이었다. 저장된 T1CE/BB reference도
+서로 완전히 같고, 기존 생성 로그에 `paired_t1ce_or_bb` / `t1ce_bb_union` 기록이 있다.
+따라서 이 사례의 20,571 voxel 차이는 단일 BB brain mask와 과거 합집합 reference의 차이로 확인했다.
+v2는 주어진 단일 MRI에서 brain mask를 만들며, 별도 시퀀스나 연구용 reference를 요구하지 않는다.
+배포 구현에 reference union을 추가하지 않았다.
+
+00006/00059의 과거 reference 대비 1 voxel 차이는 공식 이미지에서도 재현되었다.
+이 두 차이의 과거 생성 환경/수치 연산 원인은 확정하지 않았다. 완전 일치로 간주하지 않는다.
+대조 기록은 검증 폴더의 `official_comparison.json`, `official_pair_comparison.json`에 있다.
+최초 공식 이미지 대조 제출 134976은 컨테이너 namespace 오류로 추론 전에 실패했다.
+이미지 복원 작업 종료 후 독립 job 134977로 성공했으며 실행 중 컨테이너를 변경하거나 migrate하지 않았다.
+
+남은 범위: 전체 78개 DA→병변 분할→후처리 통합 추론, 실제 DICOM 원본의 SynthStrip 검증,
+GPU 후처리의 모델 동시 상주 VRAM 및 실행속도 검증은 수행하지 않았다.
+후처리를 끈 경로의 계산은 기존과 동일하며, 이번 실제 영상 검증은 후처리 단계에 한정된다.

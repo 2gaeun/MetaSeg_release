@@ -20,10 +20,23 @@ def main():
     p.add_argument('--device', choices=['cuda','cpu'], default='cuda')
     p.add_argument('--threads', type=int, default=2)
     p.add_argument('--debug', action='store_true')
+    p.add_argument('--skull-strip', choices=['on','off'], default='off',
+                   help='v2: filter final native lesion mask with SynthStrip 1.8; default off (v1 behavior)')
+    p.add_argument('--synthstrip-device', choices=['cpu','cuda'], default='cpu',
+                   help='Separate brain extraction process; CPU avoids competing with resident DA/segmentation models')
+    p.add_argument('--synthstrip-home', type=Path, help='Optional SynthStrip 1.8 asset directory')
     p.add_argument('--validate-inputs-only', action='store_true')
     args = p.parse_args()
     if args.threads < 1: raise ValueError('threads must be positive')
+    skull_strip = args.skull_strip == 'on'
+    if skull_strip and args.input_format == 'nifti-pairs':
+        p.error('--skull-strip on requires an original native DICOM/NIfTI input; pseudo pairs are not native inputs')
     rows = read_input_csv(args.input_root, args.csv, args.input_format)
+    skullstripper = None
+    if skull_strip and not args.validate_inputs_only:
+        from .postprocess import SynthStrip
+        # Fail before DA inference if the optional v2 environment is unavailable.
+        skullstripper = SynthStrip(args.synthstrip_home, args.synthstrip_device, args.threads)
     args.output.mkdir(parents=True, exist_ok=False)
     records, failed = [], []
     segmenter = adapter = None
@@ -70,9 +83,13 @@ def main():
                     if segmenter is None:
                         from .segment import Segmenter
                         segmenter = Segmenter(args.weights, args.device, args.threads)
-                    result = segmenter.predict(real, synthetic, sequence, args.output/cid, args.debug, transform=transform)
+                    logs = args.output/cid/'logs'
+                    native_mask = args.output/(cid+'.nii.gz')
+                    raw_mask = logs/'native_mask_pending_postprocess.nii.gz' if skull_strip else native_mask
+                    extra = {'mask_output': raw_mask} if skull_strip else {}
+                    result = segmenter.predict(real, synthetic, sequence, args.output/cid, args.debug, transform=transform, **extra)
                     if native_real is not None:
-                        restored = load_nifti(args.output/(cid+'.nii.gz'))
+                        restored = load_nifti(raw_mask)
                         require_same_grid(native_real, restored)
                     if payload is not None:
                         from .da_adapter import save_debug
@@ -81,6 +98,19 @@ def main():
                         result['domain_adaptation'] = {k: info[k] for k in ('training_job','checkpoint_step','nfe','seed')}
                         if args.debug: save_debug(payload, args.output/cid/'logs/debug')
                         del payload
+                    if skull_strip:
+                        from .postprocess import postprocess_native
+                        try:
+                            result['postprocessing'] = postprocess_native(native_real, raw_mask, native_mask, logs,
+                                skullstripper, args.debug, path if args.input_format == 'nifti' else None)
+                        except Exception as exc:
+                            result.update(status='failed', pipeline_version='v2',
+                                          postprocessing=dict(status='failed', requested=True, error=str(exc)))
+                            (logs/'result.json').write_text(json.dumps(result,indent=2)+'\n')
+                            raise
+                    result['skull_stripping'] = skull_strip
+                    result['pipeline_version'] = 'v2' if skull_strip else 'v1'
+                    (logs/'result.json').write_text(json.dumps(result,indent=2)+'\n')
                     records.append(dict(id=cid,**identity,sequence=sequence,series_uid=uid,**result))
                     print('VOLUME_DONE', cid, flush=True)
             except Exception as exc:
@@ -94,7 +124,8 @@ def main():
             adapter.close()
     (args.output/'manifest.json').write_text(json.dumps(dict(status='failed' if failed else 'completed',
         volumes=records,errors=failed,debug=args.debug,input_format=args.input_format,
-        validation_only=args.validate_inputs_only),indent=2)+'\n')
+        validation_only=args.validate_inputs_only, skull_stripping=skull_strip,
+        pipeline_version='v2' if skull_strip else 'v1'),indent=2)+'\n')
     if failed: raise SystemExit(1)
 
 

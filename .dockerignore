@@ -1,6 +1,8 @@
 weights/
 samples/
 outputs/
+backups/
+.git/
 **/__pycache__/
 *.partial*
 docker/*.tar.gz

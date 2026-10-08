@@ -1,0 +1,220 @@
+{
+  "status": "completed",
+  "cases": 6,
+  "scope": "SynthStrip generation and native lesion postprocessing only, using previously saved lesion predictions. No new DA/lesion inference.",
+  "brain_exact_cases": 3,
+  "filtered_lesion_exact_cases": 6,
+  "date": "2026-10-08",
+  "unit_tests": {
+    "v1": 28,
+    "v2": 28
+  },
+  "synthstrip_device": "cpu",
+  "threads": 2,
+  "full_da_segmentation_inference": false,
+  "results": [
+    {
+      "case_id": "BrainMet_test_00001",
+      "sequence": "t1ce",
+      "native_shape": [
+        1024,
+        1024,
+        150
+      ],
+      "spacing": [
+        0.234375,
+        0.234375,
+        1.0
+      ],
+      "orientation": "LPS",
+      "brain_geometry_match": true,
+      "brain_different_voxels": 0,
+      "brain_voxel_agreement": 1.0,
+      "brain_dice": 1.0,
+      "filtered_lesion_different_voxels_vs_reference_brain": 0,
+      "brain_voxels": 23864062,
+      "lesion_voxels_before": 42016,
+      "lesion_voxels_after": 42007
+    },
+    {
+      "case_id": "BrainMet_test_00006",
+      "sequence": "bb",
+      "native_shape": [
+        512,
+        512,
+        160
+      ],
+      "spacing": [
+        0.4687501788139343,
+        0.4687499701976776,
+        1.0
+      ],
+      "orientation": "LPS",
+      "brain_geometry_match": true,
+      "brain_different_voxels": 1,
+      "brain_voxel_agreement": 0.9999999761581421,
+      "brain_dice": 0.9999999383386825,
+      "filtered_lesion_different_voxels_vs_reference_brain": 0,
+      "brain_voxels": 8108812,
+      "lesion_voxels_before": 3920,
+      "lesion_voxels_after": 3920
+    },
+    {
+      "case_id": "BrainMet_test_00011",
+      "sequence": "t1ce",
+      "native_shape": [
+        480,
+        480,
+        150
+      ],
+      "spacing": [
+        0.5,
+        0.5,
+        1.0
+      ],
+      "orientation": "LAS",
+      "brain_geometry_match": true,
+      "brain_different_voxels": 0,
+      "brain_voxel_agreement": 1.0,
+      "brain_dice": 1.0,
+      "filtered_lesion_different_voxels_vs_reference_brain": 0,
+      "brain_voxels": 5222005,
+      "lesion_voxels_before": 4847,
+      "lesion_voxels_after": 4847
+    },
+    {
+      "case_id": "BrainMet_test_00018",
+      "sequence": "t1ce",
+      "native_shape": [
+        512,
+        512,
+        115
+      ],
+      "spacing": [
+        0.5,
+        0.5,
+        1.5
+      ],
+      "orientation": "LPS",
+      "brain_geometry_match": true,
+      "brain_different_voxels": 0,
+      "brain_voxel_agreement": 1.0,
+      "brain_dice": 1.0,
+      "filtered_lesion_different_voxels_vs_reference_brain": 0,
+      "brain_voxels": 4664526,
+      "lesion_voxels_before": 23060,
+      "lesion_voxels_after": 23046
+    },
+    {
+      "case_id": "BrainMet_test_00048",
+      "sequence": "bb",
+      "native_shape": [
+        240,
+        240,
+        176
+      ],
+      "spacing": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "orientation": "SAR",
+      "brain_geometry_match": true,
+      "brain_different_voxels": 20571,
+      "brain_voxel_agreement": 0.9979708214962121,
+      "brain_dice": 0.993404441349353,
+      "filtered_lesion_different_voxels_vs_reference_brain": 0,
+      "brain_voxels": 1549173,
+      "lesion_voxels_before": 80,
+      "lesion_voxels_after": 80
+    },
+    {
+      "case_id": "BrainMet_test_00059",
+      "sequence": "bb",
+      "native_shape": [
+        180,
+        256,
+        256
+      ],
+      "spacing": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "orientation": "RAS",
+      "brain_geometry_match": true,
+      "brain_different_voxels": 1,
+      "brain_voxel_agreement": 0.9999999152289496,
+      "brain_dice": 0.9999996918824902,
+      "filtered_lesion_different_voxels_vs_reference_brain": 0,
+      "brain_voxels": 1622758,
+      "lesion_voxels_before": 0,
+      "lesion_voxels_after": 0
+    }
+  ],
+  "official_image_control": {
+    "job": 134977,
+    "results": [
+      {
+        "case_id": "BrainMet_test_00006",
+        "official_voxels": 8108812,
+        "v2_voxels": 8108812,
+        "stored_voxels": 8108811,
+        "official_vs_v2": 0,
+        "official_vs_stored": 1,
+        "v2_only": 1,
+        "stored_only": 0
+      },
+      {
+        "case_id": "BrainMet_test_00048",
+        "official_voxels": 1549173,
+        "v2_voxels": 1549173,
+        "stored_voxels": 1569744,
+        "official_vs_v2": 0,
+        "official_vs_stored": 20571,
+        "v2_only": 0,
+        "stored_only": 20571,
+        "paired_t1ce_geometry_equal": true,
+        "stored_bb_vs_stored_t1ce": 0,
+        "union_v2_bb_stored_t1ce_vs_stored_bb": 0
+      },
+      {
+        "case_id": "BrainMet_test_00059",
+        "official_voxels": 1622758,
+        "v2_voxels": 1622758,
+        "stored_voxels": 1622757,
+        "official_vs_v2": 0,
+        "official_vs_stored": 1,
+        "v2_only": 1,
+        "stored_only": 0
+      }
+    ],
+    "all_three_bitwise_equal_to_v2": true
+  },
+  "reference_union_control": {
+    "job": 134978,
+    "results": [
+      {
+        "case_id": "BrainMet_test_00048",
+        "official_voxels": 1549173,
+        "v2_voxels": 1549173,
+        "stored_voxels": 1569744,
+        "official_vs_v2": 0,
+        "official_vs_stored": 20571,
+        "v2_only": 0,
+        "stored_only": 20571,
+        "paired_t1ce_geometry_equal": true,
+        "stored_bb_vs_stored_t1ce": 0,
+        "union_v2_bb_stored_t1ce_vs_stored_bb": 0,
+        "official_t1ce_vs_stored": 13949,
+        "official_pair_union_vs_stored": 0
+      }
+    ],
+    "conclusion": "Case 00048 stored mask is exactly the union of independently generated official T1CE and BB masks. v2 uses the single input MRI."
+  },
+  "limitations": [
+    "One-voxel differences against historical masks in cases 00006/00059 remain unexplained; official 1.8 and v2 agree exactly on both.",
+    "No full DA/lesion/postprocessing testset run.",
+    "No real DICOM SynthStrip or concurrent GPU VRAM validation."
+  ]
+}

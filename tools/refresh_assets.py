@@ -30,7 +30,7 @@ def main():
         for f in (root/directory).rglob('*'):
             if f.is_file() and '__pycache__' not in f.parts and not f.name.endswith('.pyc'):
                 selected.add(str(f.relative_to(root)))
-    selected.update(('run.sh','HANDOFF.md','.gitignore','.dockerignore'))
+    selected.update(('run.sh','run_v1.sh','HANDOFF.md','.gitignore','.dockerignore'))
     result={}
     for name in sorted(selected):
         f=root/name
@@ -40,7 +40,10 @@ def main():
                     checkpoint_filename='checkpoint_epoch_0950.pth',
                     trainer='nnUNetTrainerBrainMetaFocalLR3e3Components',
                     segmentation_weights='weights/segmentation_131329',
-                    space='pseudo-1mm model space', skull_stripping=False)
+                    space='pseudo-1mm model space', skull_stripping=False,
+                    release_version='v2', optional_postprocessing='SynthStrip 1.8 native lesion AND brain',
+                    postprocessing_default='off', fallback_image='brainmetaseg-da-deploy:v1',
+                    postprocessing_image='brainmetaseg-da-deploy:v2')
     manifest['files']=result
     manifest['total_bytes']=sum(r['bytes'] for r in result.values())
     manifest['domain_adaptation']={'t1ce2bb':{'job':112788,'step':175000},

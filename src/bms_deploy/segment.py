@@ -50,9 +50,9 @@ class Segmenter:
             ck['trainer_name'],ck['inference_allowed_mirroring_axes'])
         self.preprocessor=self.cfg.preprocessor_class(verbose=False)
 
-    def predict(self,real,synthetic,sequence,output,debug=False,*,transform):
+    def predict(self,real,synthetic,sequence,output,debug=False,*,transform,mask_output=None):
         output=Path(output)
-        mask_path=output.parent/(output.name+'.nii.gz')
+        mask_path=Path(mask_output) if mask_output is not None else output.parent/(output.name+'.nii.gz')
         if mask_path.exists():raise FileExistsError(mask_path)
         output.mkdir(parents=True,exist_ok=False)
         logs=output/'logs';logs.mkdir()

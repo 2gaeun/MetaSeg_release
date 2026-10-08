@@ -1,0 +1,16 @@
+{
+  "upstream_image": "docker.io/freesurfer/synthstrip:1.8",
+  "upstream_digest": "docker.io/freesurfer/synthstrip@sha256:ebbc177221194371f16362513ace68312a22922bb581bdfa618ac7ff9c1d2c06",
+  "script_sha256": "fa18eb301568dc7c99bd9f69805545a7ce6d68e3fa3e1775c68053c9069cc4a1",
+  "weight_sha256": "37417f802196186441aae3e7f385d94f8a98c64a88acaeaa2723af995c653e33",
+  "model_version": 1,
+  "surfa_commit": "ca4e26317d3556776268ede7de20752743bf49a2",
+  "packages": {
+    "surfa": "0.6.1",
+    "xxhash": "3.5.0",
+    "importlib_resources": "6.5.2"
+  },
+  "platform": "linux/amd64, Python 3.10",
+  "source": "https://surfer.nmr.mgh.harvard.edu/docs/synthstrip/",
+  "policy": "Original script and weights; runtime packages copied from official image with metadata/licenses. No torch/numpy/nnU-Net dependency upgrades."
+}
