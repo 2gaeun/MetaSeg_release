@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
-VERSION=${1:-v2}
-case "$VERSION" in v1|v2) ;; *) echo 'Usage: bash docker/load.sh [v1|v2]' >&2; exit 2 ;; esac
-IMAGE_REF=${IMAGE_REF:-brainmetaseg-da-deploy:$VERSION}
-ARCHIVE=${ARCHIVE:-$ROOT/docker/brainmetaseg-da-deploy_${VERSION}.tar.gz}
+ARCHIVE=${1:-$ROOT/docker/MetaSeg_image.tar.gz}
+IMAGE=${METASEG_IMAGE:-metaseg:2.0}
+[[ -f "$ARCHIVE" ]] || { echo "이미지 파일이 없습니다: $ARCHIVE" >&2; exit 1; }
 if [[ -f "$ARCHIVE.sha256" ]]; then
-  (cd -- "$(dirname -- "$ARCHIVE")" && sha256sum -c "$(basename -- "$ARCHIVE").sha256")
+ read -r expected _ < "$ARCHIVE.sha256"
+ [[ "$expected" =~ ^[[:xdigit:]]{64}$ ]] || { echo '체크섬 파일 형식을 확인하세요.' >&2; exit 1; }
+ actual=$(sha256sum "$ARCHIVE"); actual=${actual%% *}
+ [[ "$actual" == "${expected,,}" ]] || { echo '이미지 파일이 손상되었거나 체크섬과 다릅니다.' >&2; exit 1; }
 fi
 gzip -dc "$ARCHIVE" | docker load
-# Podman-built archives can carry a localhost/ prefix; standard Docker needs an explicit alias.
-if ! docker image inspect "$IMAGE_REF" >/dev/null 2>&1; then
-  docker image inspect "localhost/$IMAGE_REF" >/dev/null
-  docker tag "localhost/$IMAGE_REF" "$IMAGE_REF"
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+ for ref in "localhost/$IMAGE" brainmetaseg-da-deploy:v2 localhost/brainmetaseg-da-deploy:v2; do
+  if docker image inspect "$ref" >/dev/null 2>&1; then docker tag "$ref" "$IMAGE"; break; fi
+ done
 fi
-echo "Image ready: $IMAGE_REF"
+docker image inspect "$IMAGE" >/dev/null
+echo '이미지 준비 완료'

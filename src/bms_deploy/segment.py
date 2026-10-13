@@ -21,7 +21,7 @@ class Segmenter:
     def __init__(self,weights,device='cuda',threads=2):
         if importlib.metadata.version('nnunetv2')!='2.8.1':raise RuntimeError('Requires nnunetv2==2.8.1')
         from nnunetv2.utilities.plans_handling.plans_handler import PlansManager
-        from .trainer import nnUNetTrainerBrainMetaFocalLR3e3Components as Trainer
+        from nnunetv2.utilities.get_network_from_plans import get_network_from_plans
         from nnunetv2.inference.predict_from_raw_data import nnUNetPredictor
         torch.set_num_threads(threads);self.threads=threads
         os.environ['nnUNet_compile']='false'
@@ -34,8 +34,10 @@ class Segmenter:
             raise ValueError('Expected Dataset510 two-channel metadata')
         if list(self.cfg.patch_size)!=[112,128,160] or list(self.cfg.spacing)!=[1,1,1]:raise ValueError('Unexpected plan')
         self.labels=self.plans.get_label_manager(self.dataset)
-        self.network=Trainer.build_network_architecture(self.plans,self.cfg,
-            2,self.labels.num_segmentation_heads,enable_deep_supervision=False)
+        self.network=get_network_from_plans(
+            self.cfg.network_arch_class_name,self.cfg.network_arch_init_kwargs,
+            self.cfg.network_arch_init_kwargs_req_import,2,self.labels.num_segmentation_heads,
+            allow_init=True,deep_supervision=False)
         # Only load bundled, trusted checkpoint files. torch checkpoint is pickle-based.
         ck=torch.load(self.weights/'checkpoint_epoch_0950.pth',map_location='cpu',weights_only=False)
         if ck['trainer_name']!='nnUNetTrainerBrainMetaFocalLR3e3Components':raise ValueError('Wrong checkpoint trainer')

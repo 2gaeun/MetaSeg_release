@@ -1,8 +1,8 @@
-weights/
-samples/
-outputs/
-backups/
-.git/
+**
+!src/
+!src/**
+!docker/
+!docker/Dockerfile
+!docker/requirements.txt
 **/__pycache__/
-*.partial*
-docker/*.tar.gz
+**/*.pyc

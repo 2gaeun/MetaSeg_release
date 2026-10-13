@@ -22,3 +22,20 @@
 *.egg-info/
 /src/build/
 /.venv/
+
+# User images/results must never be uploaded.
+/input/*
+!/input/series.csv
+!/input/.gitkeep
+/output/*
+!/output/.gitkeep
+# Local research and historical files are outside this release.
+/tests/
+/tools/
+/weights/**/trainer_source/
+/weights/segmentation_123195/
+/weights/**/provenance.json
+/weights/da_export.json
+/HANDOFF.md
+/README_v1.md
+/README_v2.md
